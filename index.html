@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD con EasyUI</title>
+    <link rel="stylesheet" type="text/css" href="jquery-easyui-1.11.3/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="jquery-easyui-1.11.3/themes/icon.css">
+    <script type="text/javascript" src="jquery-easyui-1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="jquery-easyui-1.11.3/jquery.easyui.min.js"></script>
+</head>
+
+<body>
+
+    <h2>CRUD con EasyUI</h2>
+
+    <!-- Botones de acciones -->
+    <div style="margin-bottom:10px">
+        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="newUser()">Nuevo</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="editUser()">Editar</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="deleteUser()">Eliminar</a>
+    </div>
+
+    <!-- Tabla de datos -->
+    <table id="dg" title="Usuarios" class="easyui-datagrid" style="width:700px;height:300px"
+        data-options="singleSelect:true,pagination:true,collapsible:true">
+        <thead>
+            <tr>
+                <th data-options="field:'id',width:80">ID</th>
+                <th data-options="field:'nombre',width:200">Nombre</th>
+                <th data-options="field:'email',width:250">Email</th>
+                <th data-options="field:'nota',width:250">Nota</th>
+            </tr>
+        </thead>
+    </table>
+
+    <!-- Ventana modal para formulario -->
+    <div id="dlg" class="easyui-dialog" style="width:400px" closed="true" buttons="#dlg-buttons">
+        <form id="fm" method="post" style="margin:0;padding:20px 50px">
+            <div style="margin-bottom:10px">
+                <input name="nombre" class="easyui-textbox" required="true" label="Nombre:" style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="email" class="easyui-textbox" required="true" validType="email" label="Email:"
+                    style="width:100%">
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="nota" class="easyui-textbox" required="true" validType="nota" label="Nota:"
+                    style="width:100%">
+            </div>
+        </form>
+    </div>
+
+    <!-- Botones del formulario -->
+    <div id="dlg-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveUser()">Guardar</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#dlg').dialog('close')">Cancelar</a>
+    </div>
+
+    <script type="text/javascript">
+        var datos = [
+            { id: 1, nombre: 'Juan Pérez', email: 'juan@example.com', nota: 8 },
+            { id: 2, nombre: 'Ana García', email: 'ana@example.com', nota: 8 },
+            { id: 3, nombre: 'Carlos López', email: 'carlos@example.com', nota: 8 },
+            { id: 4, nombre: 'Luisa Martínez', email: 'luisa@example.com', nota: 8 }
+        ];
+
+        var editIndex = -1;
+        var nextId = 5;
+
+        $(function () {
+            $('#dg').datagrid({
+                data: datos
+            });
+        });
+
+        function newUser() {
+            $('#dlg').dialog('open').dialog('setTitle', 'Nuevo Usuario');
+            $('#fm').form('clear');
+            editIndex = -1;
+        }
+
+        function editUser() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row) {
+                $('#dlg').dialog('open').dialog('setTitle', 'Editar Usuario');
+                $('#fm').form('load', row);
+                editIndex = $('#dg').datagrid('getRowIndex', row);
+            } else {
+                $.messager.alert('Advertencia', 'Por favor seleccione un usuario para editar.');
+            }
+        }
+
+        function saveUser() {
+            var formData = $('#fm').serializeArray();
+            var obj = {};
+            formData.forEach(field => obj[field.name] = field.value);
+
+            if (editIndex === -1) {
+                obj.id = nextId++;
+                datos.push(obj);
+            } else {
+                obj.id = datos[editIndex].id;
+                datos[editIndex] = obj;
+            }
+
+            $('#dg').datagrid('loadData', datos);
+            $('#dlg').dialog('close');
+        }
+
+        function deleteUser() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row) {
+                $.messager.confirm('Confirmar', '¿Está seguro que desea eliminar este usuario?', function (r) {
+                    if (r) {
+                        var index = $('#dg').datagrid('getRowIndex', row);
+                        datos.splice(index, 1);
+                        $('#dg').datagrid('loadData', datos);
+                    }
+                });
+            } else {
+                $.messager.alert('Advertencia', 'Seleccione un usuario para eliminar.');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
