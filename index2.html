@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD sin jQuery</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    button {
+      margin: 0 5px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      width: 300px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>CRUD sin jQuery</h2>
+
+<button onclick="newUser()">Nuevo</button>
+<button onclick="editUser()">Editar</button>
+<button onclick="deleteUser()">Eliminar</button>
+
+<table id="userTable">
+  <thead>
+    <tr>
+      <th>ID</th><th>Nombre</th><th>Email</th><th>Nota</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <form id="userForm">
+      <label>Nombre:<br><input type="text" name="nombre" required></label><br><br>
+      <label>Email:<br><input type="email" name="email" required></label><br><br>
+      <label>Nota:<br><input type="number" name="nota" required></label><br><br>
+      <button type="submit">Guardar</button>
+      <button type="button" onclick="closeModal()">Cancelar</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  let datos = [
+    { id: 1, nombre: 'Juan Pérez', email: 'juan@example.com', nota: 8 },
+    { id: 2, nombre: 'Ana García', email: 'ana@example.com', nota: 8 },
+    { id: 3, nombre: 'Carlos López', email: 'carlos@example.com', nota: 8 },
+    { id: 4, nombre: 'Luisa Martínez', email: 'luisa@example.com', nota: 8 }
+  ];
+  let nextId = 5;
+  let editIndex = -1;
+
+  const tableBody = document.querySelector('#userTable tbody');
+  const modal = document.getElementById('modal');
+  const form = document.getElementById('userForm');
+
+  let selectedRowIndex = null;
+
+  function renderTable() {
+    tableBody.innerHTML = '';
+    datos.forEach((user, index) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.nombre}</td>
+        <td>${user.email}</td>
+        <td>${user.nota}</td>
+      `;
+      row.onclick = () => {
+        document.querySelectorAll('#userTable tbody tr').forEach(r => r.style.backgroundColor = '');
+        row.style.backgroundColor = '#eef';
+        selectedRowIndex = index;
+      };
+      tableBody.appendChild(row);
+    });
+  }
+
+  function newUser() {
+    editIndex = -1;
+    form.reset();
+    openModal();
+  }
+
+  function editUser() {
+    if (selectedRowIndex === null) {
+      alert('Seleccione un usuario para editar.');
+      return;
+    }
+    editIndex = selectedRowIndex;
+    const user = datos[editIndex];
+    form.nombre.value = user.nombre;
+    form.email.value = user.email;
+    form.nota.value = user.nota;
+    openModal();
+  }
+
+  function deleteUser() {
+    if (selectedRowIndex === null) {
+      alert('Seleccione un usuario para eliminar.');
+      return;
+    }
+    if (confirm('¿Está seguro que desea eliminar este usuario?')) {
+      datos.splice(selectedRowIndex, 1);
+      selectedRowIndex = null;
+      renderTable();
+    }
+  }
+
+  function openModal() {
+    modal.style.display = 'block';
+  }
+
+  function closeModal() {
+    modal.style.display = 'none';
+  }
+
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const user = {
+      nombre: form.nombre.value,
+      email: form.email.value,
+      nota: parseFloat(form.nota.value)
+    };
+    if (editIndex === -1) {
+      user.id = nextId++;
+      datos.push(user);
+    } else {
+      user.id = datos[editIndex].id;
+      datos[editIndex] = user;
+    }
+    closeModal();
+    renderTable();
+  };
+
+  renderTable();
+</script>
+
+</body>
+</html>
