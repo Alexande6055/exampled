@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Par o Impar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+
+    input[type="number"] {
+      padding: 5px;
+      width: 100px;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin-left: 10px;
+    }
+
+    table {
+      margin-top: 20px;
+      width: 300px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .par {
+      background-color: #d4edda;
+    }
+
+    .impar {
+      background-color: #f8d7da;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Identificador de Número Par o Impar</h2>
+
+  <input type="number" id="numero" placeholder="Ingrese un número" />
+  <button onclick="agregarFila()">Agregar</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Número</th>
+        <th>Tipo</th>
+      </tr>
+    </thead>
+    <tbody id="tabla-body"></tbody>
+  </table>
+
+  <script>
+    function agregarFila() {
+      const input = document.getElementById('numero');
+      const valor = parseInt(input.value);
+
+      if (isNaN(valor)) {
+        alert("Por favor, ingrese un número válido.");
+        return;
+      }
+
+      const tipo = (valor % 2 === 0) ? "Par" : "Impar";
+      const clase = (valor % 2 === 0) ? "par" : "impar";
+
+      const fila = document.createElement('tr');
+      fila.className = clase;
+      fila.innerHTML = `
+        <td>${valor}</td>
+        <td>${tipo}</td>
+      `;
+
+      document.getElementById('tabla-body').appendChild(fila);
+
+      input.value = '';
+      input.focus();
+    }
+  </script>
+
+</body>
+</html>
